@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import router
 from app.config import settings
 from app.database import db_manager
+from app.s3_audio import router as s3_audio_router
 import logging
 
 # Configure logging
@@ -31,6 +32,7 @@ app.add_middleware(
 
 # Include routes
 app.include_router(router, prefix="/api/v1")
+app.include_router(s3_audio_router)
 
 @app.on_event("startup")
 async def startup_event():
