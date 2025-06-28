@@ -2,18 +2,59 @@ import React, { useState, useRef } from "react";
 
 function AudioFeed() {
     const [audioFiles, setAudioFiles] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [form, setForm] = useState({ name: "", location: "", file: null });
+    const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
 
-    const handleUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const newFiles = files.map((file) => ({
+    const handleModalOpen = () => setShowModal(true);
+    const handleModalClose = () => {
+        setShowModal(false);
+        setForm({ name: "", location: "", file: null });
+        setDragActive(false);
+    };
+
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) setForm((prev) => ({ ...prev, file }));
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setDragActive(false);
+        const file = e.dataTransfer.files[0];
+        if (file) setForm((prev) => ({ ...prev, file }));
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setDragActive(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setDragActive(false);
+    };
+
+    const handleUpload = (e) => {
+        e.preventDefault();
+        if (!form.name || !form.location || !form.file) return;
+        const file = form.file;
+        const newFile = {
             url: URL.createObjectURL(file),
-            name: file.name,
+            name: form.name,
+            location: form.location,
             type: file.type,
             likes: 0,
             favorite: false,
-        }));
-        setAudioFiles((prev) => [...prev, ...newFiles]);
+        };
+        setAudioFiles((prev) => [...prev, newFile]);
+        handleModalClose();
     };
 
     const handleLike = (idx) => {
@@ -36,7 +77,8 @@ function AudioFeed() {
         <div
             style={{
                 minHeight: "100vh",
-                background: "#f3f6f8", // LinkedIn-like background
+                width: "100vw", // Add this line
+                background: "#f3f6f8",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "flex-start",
@@ -65,16 +107,8 @@ function AudioFeed() {
                     Audio Feed
                 </h1>
                 <div style={{ padding: "0 32px 24px 32px", borderBottom: "1px solid #e0e0e0", marginBottom: "24px" }}>
-                    <input
-                        type="file"
-                        accept="audio/mp3, audio/mpeg, audio/mp4, audio/*, video/mp4"
-                        multiple
-                        onChange={handleUpload}
-                        style={{ display: "none" }}
-                        ref={fileInputRef}
-                    />
                     <button
-                        onClick={() => fileInputRef.current.click()}
+                        onClick={handleModalOpen}
                         style={{
                             display: "block",
                             margin: "0 auto",
@@ -93,6 +127,129 @@ function AudioFeed() {
                         + Upload Audio
                     </button>
                 </div>
+                {/* Modal */}
+                {showModal && (
+                    <div style={{
+                        position: "fixed",
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: "rgba(0,0,0,0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 1000
+                    }}>
+                        <form
+                            onSubmit={handleUpload}
+                            style={{
+                                background: "#fff",
+                                borderRadius: "12px",
+                                padding: "32px",
+                                minWidth: "320px",
+                                boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "18px",
+                                position: "relative"
+                            }}
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                        >
+                            <button
+                                type="button"
+                                onClick={handleModalClose}
+                                style={{
+                                    position: "absolute",
+                                    top: "12px",
+                                    right: "16px",
+                                    background: "none",
+                                    border: "none",
+                                    fontSize: "22px",
+                                    color: "#888",
+                                    cursor: "pointer"
+                                }}
+                                aria-label="Close"
+                            >×</button>
+                            <h2 style={{ margin: 0, color: "#222", fontWeight: 600 }}>Upload Quran Recording</h2>
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Name"
+                                value={form.name}
+                                onChange={handleFormChange}
+                                required
+                                style={{
+                                    padding: "10px",
+                                    borderRadius: "6px",
+                                    border: "1px solid #ccc",
+                                    fontSize: "16px"
+                                }}
+                            />
+                            <input
+                                type="text"
+                                name="location"
+                                placeholder="Location"
+                                value={form.location}
+                                onChange={handleFormChange}
+                                required
+                                style={{
+                                    padding: "10px",
+                                    borderRadius: "6px",
+                                    border: "1px solid #ccc",
+                                    fontSize: "16px"
+                                }}
+                            />
+                            <div
+                                style={{
+                                    border: dragActive ? "2px dashed #0a66c2" : "2px dashed #bbb",
+                                    borderRadius: "8px",
+                                    padding: "24px",
+                                    textAlign: "center",
+                                    background: dragActive ? "#eaf3fc" : "#fafbfc",
+                                    color: "#222",
+                                    cursor: "pointer",
+                                    transition: "border 0.2s, background 0.2s"
+                                }}
+                                onClick={() => fileInputRef.current.click()}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                            >
+                                {form.file ? (
+                                    <span>{form.file.name}</span>
+                                ) : (
+                                    <span>
+                                        Drag &amp; drop Quran audio here, or <span style={{ color: "#0a66c2", textDecoration: "underline" }}>browse</span>
+                                    </span>
+                                )}
+                                <input
+                                    type="file"
+                                    accept="audio/mp3, audio/mpeg, audio/mp4, audio/*, video/mp4"
+                                    style={{ display: "none" }}
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={!form.name || !form.location || !form.file}
+                                style={{
+                                    padding: "10px 0",
+                                    background: (!form.name || !form.location || !form.file) ? "#bbb" : "#0a66c2",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "24px",
+                                    fontSize: "16px",
+                                    fontWeight: 600,
+                                    cursor: (!form.name || !form.location || !form.file) ? "not-allowed" : "pointer",
+                                    marginTop: "8px"
+                                }}
+                            >
+                                Upload
+                            </button>
+                        </form>
+                    </div>
+                )}
                 <div style={{ padding: "0 32px 32px 32px" }}>
                     {audioFiles.map((file, idx) => (
                         <div
@@ -122,7 +279,10 @@ function AudioFeed() {
                                         border: "2px solid #e0e0e0"
                                     }}
                                 />
-                                <strong style={{ fontSize: "1.1rem", flex: 1 }}>{file.name}</strong>
+                                <div style={{ flex: 1 }}>
+                                    <strong style={{ fontSize: "1.1rem" }}>{file.name}</strong>
+                                    <div style={{ fontSize: "0.95rem", color: "#666" }}>{file.location}</div>
+                                </div>
                                 <button
                                     onClick={() => handleFavorite(idx)}
                                     style={{
