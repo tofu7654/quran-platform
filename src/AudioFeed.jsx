@@ -11,7 +11,7 @@ function AudioFeed() {
             name: file.name,
             type: file.type,
             likes: 0,
-            favorite: false, // Add favorite property
+            favorite: false,
         }));
         setAudioFiles((prev) => [...prev, ...newFiles]);
     };
@@ -36,75 +36,99 @@ function AudioFeed() {
         <div
             style={{
                 minHeight: "100vh",
+                background: "#f3f6f8", // LinkedIn-like background
                 display: "flex",
                 justifyContent: "center",
-                alignItems: "center",
-                background: "#23272f",
+                alignItems: "flex-start",
+                padding: "40px 0",
             }}
         >
             <div
                 style={{
-                    background: "#2c2f36",
+                    background: "#fff",
                     borderRadius: "12px",
-                    boxShadow: "0 2px 16px rgba(0,0,0,0.18)",
-                    padding: "32px 24px",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+                    padding: "32px 0 0 0",
                     width: "100%",
-                    maxWidth: "480px",
+                    maxWidth: "600px",
+                    border: "1px solid #e0e0e0",
                 }}
             >
-                <h1 style={{ 
-                    textAlign: "center", 
+                <h1 style={{
+                    textAlign: "center",
                     marginBottom: "24px",
-                    color: "#fff"
+                    color: "#222",
+                    fontWeight: 700,
+                    fontSize: "2rem",
+                    letterSpacing: "-1px"
                 }}>
                     Audio Feed
                 </h1>
-                <input
-                    type="file"
-                    accept="audio/mp3, audio/mpeg, audio/mp4, audio/*, video/mp4"
-                    multiple
-                    onChange={handleUpload}
-                    style={{ display: "none" }}
-                    ref={fileInputRef}
-                />
-                <button
-                    onClick={() => fileInputRef.current.click()}
-                    style={{
-                        display: "block",
-                        margin: "0 auto 32px auto",
-                        padding: "10px 24px",
-                        background: "#007bff",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.12)",
-                    }}
-                >
-                    Upload Audio
-                </button>
-                <div>
+                <div style={{ padding: "0 32px 24px 32px", borderBottom: "1px solid #e0e0e0", marginBottom: "24px" }}>
+                    <input
+                        type="file"
+                        accept="audio/mp3, audio/mpeg, audio/mp4, audio/*, video/mp4"
+                        multiple
+                        onChange={handleUpload}
+                        style={{ display: "none" }}
+                        ref={fileInputRef}
+                    />
+                    <button
+                        onClick={() => fileInputRef.current.click()}
+                        style={{
+                            display: "block",
+                            margin: "0 auto",
+                            padding: "10px 28px",
+                            background: "#0a66c2",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "24px",
+                            fontSize: "16px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                            transition: "background 0.2s",
+                        }}
+                    >
+                        + Upload Audio
+                    </button>
+                </div>
+                <div style={{ padding: "0 32px 32px 32px" }}>
                     {audioFiles.map((file, idx) => (
                         <div
                             key={idx}
                             style={{
-                                margin: "20px 0",
-                                padding: "16px",
-                                borderRadius: "8px",
-                                background: "#23272f",
-                                boxShadow: "0 1px 4px rgba(0,0,0,0.10)",
-                                color: "#fff"
+                                margin: "0 0 32px 0",
+                                padding: "20px",
+                                borderRadius: "12px",
+                                background: "#fff",
+                                border: "1px solid #e0e0e0",
+                                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                                color: "#222",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px"
                             }}
                         >
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <strong>{file.name}</strong>
+                            <div style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+                                <img
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(file.name)}&background=0a66c2&color=fff&rounded=true&size=40`}
+                                    alt="avatar"
+                                    style={{
+                                        width: "40px",
+                                        height: "40px",
+                                        borderRadius: "50%",
+                                        marginRight: "12px",
+                                        border: "2px solid #e0e0e0"
+                                    }}
+                                />
+                                <strong style={{ fontSize: "1.1rem", flex: 1 }}>{file.name}</strong>
                                 <button
                                     onClick={() => handleFavorite(idx)}
                                     style={{
                                         background: "none",
                                         border: "none",
-                                        color: file.favorite ? "#ffd700" : "#888",
+                                        color: file.favorite ? "#f9c846" : "#bbb",
                                         fontSize: "22px",
                                         cursor: "pointer",
                                         marginLeft: "8px"
@@ -116,17 +140,17 @@ function AudioFeed() {
                                 </button>
                             </div>
                             {file.type.startsWith("audio") ? (
-                                <audio controls src={file.url} style={{ width: "100%", background: "#23272f" }} />
+                                <audio controls src={file.url} style={{ width: "100%" }} />
                             ) : (
-                                <video controls width="100%" src={file.url} style={{ background: "#23272f" }} />
+                                <video controls width="100%" src={file.url} />
                             )}
-                            <div style={{ marginTop: "10px", display: "flex", alignItems: "center" }}>
+                            <div style={{ marginTop: "8px", display: "flex", alignItems: "center" }}>
                                 <button
                                     onClick={() => handleLike(idx)}
                                     style={{
                                         background: "none",
                                         border: "none",
-                                        color: "#ff4d4f",
+                                        color: "#e63946",
                                         fontSize: "20px",
                                         cursor: "pointer",
                                         marginRight: "8px"
@@ -135,7 +159,7 @@ function AudioFeed() {
                                 >
                                     ❤️
                                 </button>
-                                <span>{file.likes} {file.likes === 1 ? "Like" : "Likes"}</span>
+                                <span style={{ fontWeight: 500 }}>{file.likes} {file.likes === 1 ? "Like" : "Likes"}</span>
                             </div>
                         </div>
                     ))}
