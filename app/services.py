@@ -54,6 +54,41 @@ class RecitationService:
             logger.error(f"Failed to create recitation: {e}")
             return None
     
+    async def create_recitation_with_url(self, recitation_data: RecitationCreate, 
+                                       audio_url: str, user_id: str) -> Optional[Dict[str, Any]]:
+        """Create a new recitation with existing S3 URL"""
+        try:
+            # Create recitation document
+            recitation_doc = {
+                "title": recitation_data.title,
+                "reciter_name": recitation_data.reciter_name,
+                "masjid_name": recitation_data.masjid_name,
+                "masjid_location": recitation_data.masjid_location,
+                "surah_name": recitation_data.surah_name,
+                "surah_number": recitation_data.surah_number,
+                "ayah_start": recitation_data.ayah_start,
+                "ayah_end": recitation_data.ayah_end,
+                "description": recitation_data.description,
+                "tags": recitation_data.tags or [],
+                "uploader_id": user_id,
+                "audio_url": audio_url,
+                "status": RecitationStatus.PENDING.value,
+                "likes_count": 0,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            # Insert into MongoDB
+            result = self.recitations_collection.insert_one(recitation_doc)
+            recitation_doc["_id"] = result.inserted_id
+            
+            logger.info(f"Recitation created successfully: {result.inserted_id}")
+            return self._format_recitation(recitation_doc)
+            
+        except Exception as e:
+            logger.error(f"Failed to create recitation: {e}")
+            return None
+    
     async def get_recitations(self, user_id: Optional[str] = None, 
                             mine: bool = False, page: int = 1, limit: int = 20) -> List[Dict[str, Any]]:
         """Get recitations with optional filtering"""
@@ -318,6 +353,65 @@ class RecitationService:
             
         except Exception as e:
             logger.error(f"Failed to search recitations: {e}")
+            return []
+    
+    async def update_recitation_status(self, recitation_id: str, status: RecitationStatus, 
+                                     reason: Optional[str], user_id: str) -> Optional[Dict[str, Any]]:
+        """Update recitation status (admin function)"""
+        try:
+            # Check if recitation exists
+            recitation = self.recitations_collection.find_one({"_id": ObjectId(recitation_id)})
+            if not recitation:
+                return None
+            
+            # Update status
+            update_fields = {
+                "status": status.value,
+                "updated_at": datetime.utcnow()
+            }
+            
+            if reason:
+                update_fields["status_reason"] = reason
+            
+            # Update in MongoDB
+            result = self.recitations_collection.update_one(
+                {"_id": ObjectId(recitation_id)},
+                {"$set": update_fields}
+            )
+            
+            if result.modified_count > 0:
+                # Get updated document
+                updated_doc = self.recitations_collection.find_one({"_id": ObjectId(recitation_id)})
+                return self._format_recitation(updated_doc)
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to update recitation status: {e}")
+            return None
+    
+    async def get_recitations_by_status(self, status: RecitationStatus, 
+                                      page: int = 1, limit: int = 20) -> List[Dict[str, Any]]:
+        """Get recitations by status (admin function)"""
+        try:
+            skip = (page - 1) * limit
+            
+            # Build query
+            query = {"status": status.value}
+            
+            # Get recitations
+            cursor = self.recitations_collection.find(query).sort("created_at", -1).skip(skip).limit(limit)
+            recitations = []
+            
+            for doc in cursor:
+                recitation = self._format_recitation(doc)
+                recitation["is_liked"] = False  # Admin view doesn't need like status
+                recitations.append(recitation)
+            
+            return recitations
+            
+        except Exception as e:
+            logger.error(f"Failed to get recitations by status: {e}")
             return []
     
     def _format_recitation(self, doc: Dict[str, Any]) -> Dict[str, Any]:

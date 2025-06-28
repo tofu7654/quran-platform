@@ -83,9 +83,9 @@
 							"type": "text"
 						},
 						{
-							"key": "audio_file",
-							"type": "file",
-							"src": []
+							"key": "s3_url",
+							"value": "https://example.com/audio/test.mp3",
+							"type": "text"
 						}
 					]
 				},
@@ -301,6 +301,58 @@
 						{
 							"key": "limit",
 							"value": "10"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "S3 Upload Audio",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/s3/upload",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "s3", "upload"]
+				}
+			}
+		},
+		{
+			"name": "S3 Delete Audio",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/s3/delete?filename=uploads/test.mp3",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "s3", "delete"],
+					"query": [
+						{
+							"key": "filename",
+							"value": "uploads/test.mp3"
 						}
 					]
 				}

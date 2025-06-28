@@ -3,9 +3,10 @@ from fastapi.responses import JSONResponse
 from typing import List, Optional
 from app.auth import verify_token
 from app.services import recitation_service
+from app.s3_client import s3_manager
 from app.models import (
     RecitationCreate, RecitationUpdate, RecitationResponse, 
-    LikeCreate, LikeResponse, SearchFilters, PaginationParams
+    LikeCreate, LikeResponse, SearchFilters, PaginationParams, RecitationStatus
 )
 import logging
 
@@ -25,20 +26,11 @@ async def upload_recitation(
     ayah_end: Optional[int] = Form(None),
     description: Optional[str] = Form(None),
     tags: Optional[str] = Form(None),
-    audio_file: UploadFile = File(...),
+    s3_url: str = Form(...),
     user_id: str = Depends(verify_token)
 ):
-    """Upload a new recitation"""
+    """Upload a new recitation with S3 URL"""
     try:
-        # Validate file type
-        if not audio_file.content_type.startswith('audio/'):
-            raise HTTPException(status_code=400, detail="File must be an audio file")
-        
-        # Get file extension
-        file_extension = audio_file.filename.split('.')[-1].lower()
-        if file_extension not in ['mp3', 'wav', 'm4a', 'aac']:
-            raise HTTPException(status_code=400, detail="Unsupported audio format")
-        
         # Parse tags
         tag_list = []
         if tags:
@@ -58,12 +50,9 @@ async def upload_recitation(
             tags=tag_list
         )
         
-        # Read file data
-        file_data = await audio_file.read()
-        
-        # Create recitation
-        result = await recitation_service.create_recitation(
-            recitation_data, file_data, file_extension, user_id
+        # Create recitation with S3 URL
+        result = await recitation_service.create_recitation_with_url(
+            recitation_data, s3_url, user_id
         )
         
         if not result:
@@ -212,7 +201,87 @@ async def search_recitations(
         logger.error(f"Search recitations error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+@router.post("/s3/upload")
+async def upload_audio_to_s3(file: UploadFile = File(...)):
+    """Upload audio file directly to S3"""
+    try:
+        # Read the file's contents into memory
+        contents = await file.read()
+        
+        # Upload to S3 using the simplified method
+        public_url = s3_manager.upload_audio_file(contents, file.filename)
+        
+        if not public_url:
+            raise HTTPException(status_code=500, detail="Failed to upload file to S3")
+        
+        return {"url": public_url}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"S3 upload error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.delete("/s3/delete")
+async def delete_audio_from_s3(filename: str):
+    """Delete an audio file from S3 bucket"""
+    try:
+        success = s3_manager.delete_audio_file(filename)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete file from S3")
+        
+        return {"message": f"Deleted {filename} from S3"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"S3 delete error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "message": "Quran Platform API is running"} 
+    return {"status": "healthy", "message": "Quran Platform API is running"}
+
+@router.put("/admin/recitations/{recitation_id}/status")
+async def update_recitation_status(
+    recitation_id: str,
+    status: RecitationStatus = Form(...),
+    reason: Optional[str] = Form(None),
+    user_id: str = Depends(verify_token)
+):
+    """Admin endpoint to update recitation status"""
+    try:
+        # For now, allow any authenticated user to be admin
+        # In production, you'd check if user_id has admin role
+        result = await recitation_service.update_recitation_status(
+            recitation_id, status, reason, user_id
+        )
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="Recitation not found")
+        
+        return {"message": f"Recitation status updated to {status.value}", "recitation": result}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update status error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.get("/admin/recitations/pending")
+async def get_pending_recitations(
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    user_id: str = Depends(verify_token)
+):
+    """Admin endpoint to get pending recitations for review"""
+    try:
+        recitations = await recitation_service.get_recitations_by_status(
+            RecitationStatus.PENDING, page, limit
+        )
+        return recitations
+    except Exception as e:
+        logger.error(f"Get pending recitations error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") 

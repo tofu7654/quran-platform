@@ -5,13 +5,14 @@ import logging
 from typing import Optional
 import uuid
 from datetime import datetime
+import os
 
 logger = logging.getLogger(__name__)
 
 class S3Manager:
     def __init__(self):
         self.s3_client = None
-        self.bucket_name = settings.s3_bucket_name
+        self.bucket_name = settings.bucket_name
     
     def initialize(self):
         """Initialize S3 client"""
@@ -62,6 +63,36 @@ class S3Manager:
             logger.error(f"Unexpected error uploading file: {e}")
             return None
     
+    def upload_audio_file(self, file_data: bytes, filename: str) -> Optional[str]:
+        """Upload audio file to S3 (simplified method)"""
+        if not self.s3_client:
+            self.initialize()
+        
+        try:
+            # Define the S3 object key (path in bucket)
+            s3_key = f"uploads/{filename}"
+            
+            # Upload to S3
+            self.s3_client.put_object(
+                Bucket=self.bucket_name,
+                Key=s3_key,
+                Body=file_data,
+                ContentType='audio/mpeg',
+                ACL='public-read'
+            )
+            
+            # Build the public URL
+            public_url = f"https://{self.bucket_name}.s3.{settings.aws_region}.amazonaws.com/{s3_key}"
+            logger.info(f"Audio file uploaded successfully: {public_url}")
+            return public_url
+            
+        except ClientError as e:
+            logger.error(f"Failed to upload audio file to S3: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error uploading audio file: {e}")
+            return None
+    
     def delete_file(self, file_url: str) -> bool:
         """Delete file from S3"""
         if not self.s3_client:
@@ -83,6 +114,24 @@ class S3Manager:
             return False
         except Exception as e:
             logger.error(f"Unexpected error deleting file: {e}")
+            return False
+    
+    def delete_audio_file(self, filename: str) -> bool:
+        """Delete audio file from S3 (simplified method)"""
+        if not self.s3_client:
+            self.initialize()
+        
+        try:
+            s3_key = f"uploads/{filename}"
+            self.s3_client.delete_object(Bucket=self.bucket_name, Key=s3_key)
+            logger.info(f"Audio file deleted successfully: {s3_key}")
+            return True
+            
+        except ClientError as e:
+            logger.error(f"Failed to delete audio file from S3: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error deleting audio file: {e}")
             return False
 
 # Global S3 manager instance
