@@ -1,0 +1,320 @@
+{
+	"info": {
+		"_postman_id": "quran-platform-api",
+		"name": "Quran Platform API",
+		"description": "Complete API collection for testing the Quran Platform backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/health",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "health"]
+				}
+			}
+		},
+		{
+			"name": "Upload Recitation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "Beautiful Recitation of Al-Fatiha",
+							"type": "text"
+						},
+						{
+							"key": "reciter_name",
+							"value": "Sheikh Abdul Rahman Al-Sudais",
+							"type": "text"
+						},
+						{
+							"key": "masjid_name",
+							"value": "Masjid Al-Haram",
+							"type": "text"
+						},
+						{
+							"key": "masjid_location",
+							"value": "Mecca, Saudi Arabia",
+							"type": "text"
+						},
+						{
+							"key": "surah_name",
+							"value": "Al-Fatiha",
+							"type": "text"
+						},
+						{
+							"key": "surah_number",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "ayah_start",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "ayah_end",
+							"value": "7",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "A beautiful recitation of the opening chapter of the Quran",
+							"type": "text"
+						},
+						{
+							"key": "tags",
+							"value": "fatiha,opening,beautiful",
+							"type": "text"
+						},
+						{
+							"key": "audio_file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/upload",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "upload"]
+				}
+			}
+		},
+		{
+			"name": "Get All Recitations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/recitations?page=1&limit=10",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recitations"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Get My Recitations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/recitations?mine=true&page=1&limit=10",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recitations"],
+					"query": [
+						{
+							"key": "mine",
+							"value": "true"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Get Recitation by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/recitations/{{recitation_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recitations", "{{recitation_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Update Recitation",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\",\n  \"tags\": [\"updated\", \"tags\"]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/recitations/{{recitation_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recitations", "{{recitation_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Delete Recitation",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/recitations/{{recitation_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recitations", "{{recitation_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Like Recitation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"recitation_id\": \"{{recitation_id}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/likes",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "likes"]
+				}
+			}
+		},
+		{
+			"name": "Get Recommendations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/recommendations?limit=10",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "recommendations"],
+					"query": [
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Search Recitations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer dummy_token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/search?reciter_name=Sheikh&surah_name=Al-Fatiha&page=1&limit=10",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "search"],
+					"query": [
+						{
+							"key": "reciter_name",
+							"value": "Sheikh"
+						},
+						{
+							"key": "surah_name",
+							"value": "Al-Fatiha"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "recitation_id",
+			"value": "your_recitation_id_here"
+		}
+	]
+} 
