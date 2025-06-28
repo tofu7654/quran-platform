@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import FavoritesFeed from "./FavoritesFeed";
 
-function AudioFeed() {
+function AudioFeed({ user, onSignOut }) {
     const [audioFiles, setAudioFiles] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState({ name: "", location: "", file: null });
@@ -79,7 +79,7 @@ function AudioFeed() {
         <div
             style={{
                 minHeight: "100vh",
-                width: "100vw", // Add this line
+                width: "100vw",
                 background: "#f3f6f8",
                 display: "flex",
                 justifyContent: "center",
@@ -98,16 +98,35 @@ function AudioFeed() {
                     border: "1px solid #e0e0e0",
                 }}
             >
-                <h1 style={{
-                    textAlign: "center",
-                    marginBottom: "24px",
-                    color: "#222",
-                    fontWeight: 700,
-                    fontSize: "2rem",
-                    letterSpacing: "-1px"
-                }}>
-                    Audio Feed
-                </h1>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 32px" }}>
+                    <h1 style={{
+                        marginBottom: "24px",
+                        color: "#222",
+                        fontWeight: 700,
+                        fontSize: "2rem",
+                        letterSpacing: "-1px"
+                    }}>
+                        Audio Feed
+                    </h1>
+                    <button
+                        onClick={onSignOut}
+                        style={{
+                            padding: "8px 18px",
+                            background: "#fff",
+                            color: "#0a66c2",
+                            border: "1px solid #0a66c2",
+                            borderRadius: "24px",
+                            fontSize: "15px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            marginLeft: "12px",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+                            transition: "background 0.2s",
+                        }}
+                    >
+                        Sign Out
+                    </button>
+                </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 32px 24px 32px", borderBottom: "1px solid #e0e0e0", marginBottom: "24px" }}>
                     <button
                         onClick={handleModalOpen}
