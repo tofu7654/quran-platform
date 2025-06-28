@@ -1,1 +1,9 @@
 .env
+echo "__pycache__/" >> .gitignore
+echo "*.pyc" >> .gitignore
+echo "*.mp3" >> .gitignore
+git add .gitignore
+git commit -m "Add .gitignore to block pyc and mp3"
+__pycache__/
+*.pyc
+*.mp3
