@@ -1,10 +1,12 @@
 import React, { useState, useRef } from "react";
+import FavoritesFeed from "./FavoritesFeed";
 
 function AudioFeed() {
     const [audioFiles, setAudioFiles] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState({ name: "", location: "", file: null });
     const [dragActive, setDragActive] = useState(false);
+    const [showFavorites, setShowFavorites] = useState(false);
     const fileInputRef = useRef(null);
 
     const handleModalOpen = () => setShowModal(true);
@@ -106,12 +108,10 @@ function AudioFeed() {
                 }}>
                     Audio Feed
                 </h1>
-                <div style={{ padding: "0 32px 24px 32px", borderBottom: "1px solid #e0e0e0", marginBottom: "24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 32px 24px 32px", borderBottom: "1px solid #e0e0e0", marginBottom: "24px" }}>
                     <button
                         onClick={handleModalOpen}
                         style={{
-                            display: "block",
-                            margin: "0 auto",
                             padding: "10px 28px",
                             background: "#0a66c2",
                             color: "#fff",
@@ -125,6 +125,24 @@ function AudioFeed() {
                         }}
                     >
                         + Upload Audio
+                    </button>
+                    <button
+                        onClick={() => setShowFavorites(true)}
+                        style={{
+                            padding: "10px 20px",
+                            background: "#fff",
+                            color: "#0a66c2",
+                            border: "1px solid #0a66c2",
+                            borderRadius: "24px",
+                            fontSize: "16px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            marginLeft: "12px",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+                            transition: "background 0.2s",
+                        }}
+                    >
+                        ★ Favorites
                     </button>
                 </div>
                 {/* Modal */}
@@ -250,80 +268,89 @@ function AudioFeed() {
                         </form>
                     </div>
                 )}
-                <div style={{ padding: "0 32px 32px 32px" }}>
-                    {audioFiles.map((file, idx) => (
-                        <div
-                            key={idx}
-                            style={{
-                                margin: "0 0 32px 0",
-                                padding: "20px",
-                                borderRadius: "12px",
-                                background: "#fff",
-                                border: "1px solid #e0e0e0",
-                                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                                color: "#222",
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "10px"
-                            }}
-                        >
-                            <div style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
-                                <img
-                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(file.name)}&background=0a66c2&color=fff&rounded=true&size=40`}
-                                    alt="avatar"
-                                    style={{
-                                        width: "40px",
-                                        height: "40px",
-                                        borderRadius: "50%",
-                                        marginRight: "12px",
-                                        border: "2px solid #e0e0e0"
-                                    }}
-                                />
-                                <div style={{ flex: 1 }}>
-                                    <strong style={{ fontSize: "1.1rem" }}>{file.name}</strong>
-                                    <div style={{ fontSize: "0.95rem", color: "#666" }}>{file.location}</div>
+                {showFavorites ? (
+                    <FavoritesFeed
+                        audioFiles={audioFiles}
+                        onLike={(file) => handleLike(audioFiles.indexOf(file))}
+                        onFavorite={(file) => handleFavorite(audioFiles.indexOf(file))}
+                        onBack={() => setShowFavorites(false)}
+                    />
+                ) : (
+                    <div style={{ padding: "0 32px 32px 32px" }}>
+                        {audioFiles.map((file, idx) => (
+                            <div
+                                key={idx}
+                                style={{
+                                    margin: "0 0 32px 0",
+                                    padding: "20px",
+                                    borderRadius: "12px",
+                                    background: "#fff",
+                                    border: "1px solid #e0e0e0",
+                                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                                    color: "#222",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "10px"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+                                    <img
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(file.name)}&background=0a66c2&color=fff&rounded=true&size=40`}
+                                        alt="avatar"
+                                        style={{
+                                            width: "40px",
+                                            height: "40px",
+                                            borderRadius: "50%",
+                                            marginRight: "12px",
+                                            border: "2px solid #e0e0e0"
+                                        }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                        <strong style={{ fontSize: "1.1rem" }}>{file.name}</strong>
+                                        <div style={{ fontSize: "0.95rem", color: "#666" }}>{file.location}</div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleFavorite(idx)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: file.favorite ? "#f9c846" : "#bbb",
+                                            fontSize: "22px",
+                                            cursor: "pointer",
+                                            marginLeft: "8px"
+                                        }}
+                                        aria-label="Favorite"
+                                        title={file.favorite ? "Unfavorite" : "Favorite"}
+                                    >
+                                        {file.favorite ? "★" : "☆"}
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => handleFavorite(idx)}
-                                    style={{
-                                        background: "none",
-                                        border: "none",
-                                        color: file.favorite ? "#f9c846" : "#bbb",
-                                        fontSize: "22px",
-                                        cursor: "pointer",
-                                        marginLeft: "8px"
-                                    }}
-                                    aria-label="Favorite"
-                                    title={file.favorite ? "Unfavorite" : "Favorite"}
-                                >
-                                    {file.favorite ? "★" : "☆"}
-                                </button>
+                                {file.type.startsWith("audio") ? (
+                                    <audio controls src={file.url} style={{ width: "100%" }} />
+                                ) : (
+                                    <video controls width="100%" src={file.url} />
+                                )}
+                                <div style={{ marginTop: "8px", display: "flex", alignItems: "center" }}>
+                                    <button
+                                        onClick={() => handleLike(idx)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "#e63946",
+                                            fontSize: "20px",
+                                            cursor: "pointer",
+                                            marginRight: "8px"
+                                        }}
+                                        aria-label="Like"
+                                    >
+                                        ❤️
+                                    </button>
+                                    <span style={{ fontWeight: 500 }}>{file.likes} {file.likes === 1 ? "Like" : "Likes"}</span>
+                                </div>
                             </div>
-                            {file.type.startsWith("audio") ? (
-                                <audio controls src={file.url} style={{ width: "100%" }} />
-                            ) : (
-                                <video controls width="100%" src={file.url} />
-                            )}
-                            <div style={{ marginTop: "8px", display: "flex", alignItems: "center" }}>
-                                <button
-                                    onClick={() => handleLike(idx)}
-                                    style={{
-                                        background: "none",
-                                        border: "none",
-                                        color: "#e63946",
-                                        fontSize: "20px",
-                                        cursor: "pointer",
-                                        marginRight: "8px"
-                                    }}
-                                    aria-label="Like"
-                                >
-                                    ❤️
-                                </button>
-                                <span style={{ fontWeight: 500 }}>{file.likes} {file.likes === 1 ? "Like" : "Likes"}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
