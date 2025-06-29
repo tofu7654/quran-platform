@@ -231,7 +231,9 @@ function AudioFeed({ user, onSignOut }) {
                                     padding: "10px",
                                     borderRadius: "6px",
                                     border: "1px solid #ccc",
-                                    fontSize: "16px"
+                                    fontSize: "16px",
+                                    background: "#fff", // <-- white background
+                                    color: "#222",      // <-- black text
                                 }}
                             />
                             <input
@@ -245,7 +247,9 @@ function AudioFeed({ user, onSignOut }) {
                                     padding: "10px",
                                     borderRadius: "6px",
                                     border: "1px solid #ccc",
-                                    fontSize: "16px"
+                                    fontSize: "16px",
+                                    background: "#fff", // <-- white background
+                                    color: "#222",      // <-- black text
                                 }}
                             />
                             <div
