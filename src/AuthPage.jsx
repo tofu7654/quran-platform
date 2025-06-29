@@ -152,7 +152,7 @@ function AuthPage({ onAuth }) {
                         style={{
                             width: "100%",            // Make button stretch full width
                             padding: "10px 0",        // Keep vertical padding
-                            background: "#0a66c2",
+                            background: "#1db954", // green
                             color: "#fff",
                             border: "none",
                             borderRadius: "24px",
@@ -169,7 +169,7 @@ function AuthPage({ onAuth }) {
                             <>
                                 Don't have an account?{" "}
                                 <span
-                                    style={{ color: "#0a66c2", cursor: "pointer" }}
+                                    style={{ color: "#1db954", cursor: "pointer" }} // green
                                     onClick={() => setIsLogin(false)}
                                 >
                                     Sign Up
@@ -179,7 +179,7 @@ function AuthPage({ onAuth }) {
                             <>
                                 Already have an account?{" "}
                                 <span
-                                    style={{ color: "#0a66c2", cursor: "pointer" }}
+                                    style={{ color: "#1db954", cursor: "pointer" }} // green
                                     onClick={() => setIsLogin(true)}
                                 >
                                     Login

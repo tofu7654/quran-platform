@@ -125,8 +125,8 @@ function AudioFeed({ user, onSignOut }) {
                         style={{
                             padding: "8px 18px",
                             background: "#fff",
-                            color: "#0a66c2",
-                            border: "1px solid #0a66c2",
+                            color: "#1db954", // green
+                            border: "1px solid #1db954", // green
                             borderRadius: "24px",
                             fontSize: "15px",
                             fontWeight: 600,
@@ -144,7 +144,7 @@ function AudioFeed({ user, onSignOut }) {
                         onClick={handleModalOpen}
                         style={{
                             padding: "10px 28px",
-                            background: "#0a66c2",
+                            background: "#1db954", // green
                             color: "#fff",
                             border: "none",
                             borderRadius: "24px",
@@ -162,8 +162,8 @@ function AudioFeed({ user, onSignOut }) {
                         style={{
                             padding: "10px 20px",
                             background: "#fff",
-                            color: "#0a66c2",
-                            border: "1px solid #0a66c2",
+                            color: "#1db954", // green
+                            border: "1px solid #1db954", // green
                             borderRadius: "24px",
                             fontSize: "16px",
                             fontWeight: 600,
@@ -250,11 +250,11 @@ function AudioFeed({ user, onSignOut }) {
                             />
                             <div
                                 style={{
-                                    border: dragActive ? "2px dashed #0a66c2" : "2px dashed #bbb",
+                                    border: dragActive ? "2px dashed #1db954" : "2px dashed #bbb",
                                     borderRadius: "8px",
                                     padding: "24px",
                                     textAlign: "center",
-                                    background: dragActive ? "#eaf3fc" : "#fafbfc",
+                                    background: dragActive ? "#eafbe7" : "#fafbfc", // light green background when active
                                     color: "#222",
                                     cursor: "pointer",
                                     transition: "border 0.2s, background 0.2s"
@@ -268,7 +268,7 @@ function AudioFeed({ user, onSignOut }) {
                                     <span>{form.file.name}</span>
                                 ) : (
                                     <span>
-                                        Drag &amp; drop Quran audio here, or <span style={{ color: "#0a66c2", textDecoration: "underline" }}>browse</span>
+                                        Drag &amp; drop Quran audio here, or <span style={{ color: "#1db954", textDecoration: "underline" }}>browse</span>
                                     </span>
                                 )}
                                 <input
@@ -284,7 +284,7 @@ function AudioFeed({ user, onSignOut }) {
                                 disabled={!form.name || !form.location || !form.file}
                                 style={{
                                     padding: "10px 0",
-                                    background: (!form.name || !form.location || !form.file) ? "#bbb" : "#0a66c2",
+                                    background: (!form.name || !form.location || !form.file) ? "#bbb" : "#1db954", // green
                                     color: "#fff",
                                     border: "none",
                                     borderRadius: "24px",
