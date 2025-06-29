@@ -102,15 +102,24 @@ function AudioFeed({ user, onSignOut }) {
                 }}
             >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 32px" }}>
-                    <h1 style={{
-                        marginBottom: "24px",
-                        color: "#222",
-                        fontWeight: 700,
-                        fontSize: "2rem",
-                        letterSpacing: "-1px"
+                    <div style={{
+                        width: "240px",      // Increased width
+                        height: "120px",     // Increased height
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
                     }}>
-                        Audio Feed
-                    </h1>
+                        <img
+                            src="/logo.png"
+                            alt="Logo"
+                            style={{
+                                maxWidth: "220px",   // Increased max width
+                                maxHeight: "110px",  // Increased max height
+                                objectFit: "contain",
+                                display: "block",
+                            }}
+                        />
+                    </div>
                     <button
                         onClick={onSignOut}
                         style={{

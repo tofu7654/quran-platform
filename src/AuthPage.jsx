@@ -52,6 +52,7 @@ function AuthPage({ onAuth }) {
                     <AuthImagePattern
                       title="Welcome Back!"
                       subtitle="Sign in to access your audio feed."
+                      titleStyle={{ color: "#222" }} // Title color override
                     />
                 </div>
                 {/* Auth form section */}
@@ -67,8 +68,32 @@ function AuthPage({ onAuth }) {
                         gap: "18px",
                         flex: 1,
                         justifyContent: "center",
+                        alignItems: "center", // Center logo and title
                     }}
                 >
+                    {/* Logo at the top */}
+                    <div
+                        style={{
+                            width: "100%",
+                            height: "100px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginBottom: "0",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <img
+                            src="/logo.png"
+                            alt="Logo"
+                            style={{
+                                maxWidth: "90%",
+                                maxHeight: "90px",
+                                objectFit: "contain",
+                                display: "block",
+                            }}
+                        />
+                    </div>
                     <h2 style={{ textAlign: "center", color: "#222" }}>
                         {isLogin ? "Login" : "Sign Up"}
                     </h2>
@@ -125,7 +150,8 @@ function AuthPage({ onAuth }) {
                     <button
                         type="submit"
                         style={{
-                            padding: "10px 0",
+                            width: "100%",            // Make button stretch full width
+                            padding: "10px 0",        // Keep vertical padding
                             background: "#0a66c2",
                             color: "#fff",
                             border: "none",

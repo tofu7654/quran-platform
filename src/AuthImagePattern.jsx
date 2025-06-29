@@ -43,7 +43,7 @@ function AuthImagePattern({ title, subtitle }) {
           />
         ))}
       </div>
-      <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "16px", textAlign: "center" }}>
+      <h2 style={{ color: "#222", fontSize: "1.5rem", fontWeight: 700, marginBottom: "16px", textAlign: "center" }}>
         {title}
       </h2>
       <p style={{ color: "#666", textAlign: "center" }}>{subtitle}</p>
