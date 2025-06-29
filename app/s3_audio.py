@@ -9,15 +9,14 @@ import uuid
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+from app.moderation_app import verify_audio_is_quran
+
 @router.post("/upload-audio")
 async def upload_audio_file(
     file: UploadFile = File(...),
-    user_id: Optional[str] = Query(None, description="Uploader's user ID (optional)")
+    user_id: Optional[str] = Query(None)
 ):
-    """
-    Uploads an audio file to S3 with a unique key.
-    If user_id is not provided, defaults to 'anonymous'.
-    """
+    # Enforce MP3
     if not file.filename.endswith(".mp3"):
         raise HTTPException(status_code=400, detail="Only .mp3 files are allowed.")
 
@@ -26,21 +25,23 @@ async def upload_audio_file(
 
     contents = await file.read()
 
-    try:
-        public_url = s3_manager.upload_file(
-            file_data=contents,
-            file_extension='mp3',
-            user_id=user_id
-        )
+    # ✅ Step: Check if it's Quran
+    is_quran = await verify_audio_is_quran(contents)
+    if not is_quran:
+        raise HTTPException(status_code=400, detail="Audio does not appear to be Quran recitation.")
 
-        if not public_url:
-            raise Exception("S3Manager returned None")
+    # ✅ Upload to S3
+    public_url = s3_manager.upload_file(
+        file_data=contents,
+        file_extension='mp3',
+        user_id=user_id
+    )
 
-    except Exception as e:
-        logger.error(f"Failed to upload to S3: {e}")
-        raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
+    if not public_url:
+        raise HTTPException(status_code=500, detail="Upload failed to S3.")
 
     return JSONResponse({"url": public_url})
+
 
 
 @router.delete("/delete-audio")
