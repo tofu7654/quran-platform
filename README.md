@@ -10,7 +10,7 @@ Social media platform for sharing Quran Recitations
 
 ## NECESSARY features (bare minimum)
 * Account creation
-* Uploading audio and SOME info (whether name, location, surah - at least one field must be entered in)
+* Uploading a post - audio and SOME info (whether name, location, surah - at least one field must be entered in)
 * AI Audio content moderation - verify that all audio is Quran
   * AI Text content moderation - no profanity / trolling
 * AI Audio Quran verification - verifying accuracy in the recitation of Quran, keep watch for mistakes in recitation (Tarteel)
@@ -21,6 +21,14 @@ Social media platform for sharing Quran Recitations
 * Favorite posts, saving them to a Favorites section
 * Search bar - search by reciter, location, surah etc.
 * Likes on a post
+* Deleting a post
+* Reporting a post ("This is not Quran" "There is a mistake in the recitation" "This is a troll post that slipped through the verification process")
+
+## Cherries on top features (in final app InshaAllah)
+* AI identifying what Surah it is and labeling that
+* Using QUL to pull up ayahs and follow it along as the recitation plays
+* Setting a time limit for max audio length (maybe around 30min) (bc the longer an audio, the more cost incurred if using OpenAI API)
+* Premium subscription if you wanna upload longer than 15 min?
 
 ## General notes
 * App content is all simply a page you scroll of posts consisting of an audio clip with text describing it - that's it
