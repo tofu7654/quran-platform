@@ -201,44 +201,6 @@ async def search_recitations(
         logger.error(f"Search recitations error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/s3/upload")
-async def upload_audio_to_s3(file: UploadFile = File(...)):
-    """Upload audio file directly to S3"""
-    try:
-        # Read the file's contents into memory
-        contents = await file.read()
-        
-        # Upload to S3 using the simplified method
-        public_url = s3_manager.upload_audio_file(contents, file.filename)
-        
-        if not public_url:
-            raise HTTPException(status_code=500, detail="Failed to upload file to S3")
-        
-        return {"url": public_url}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"S3 upload error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-@router.delete("/s3/delete")
-async def delete_audio_from_s3(filename: str):
-    """Delete an audio file from S3 bucket"""
-    try:
-        success = s3_manager.delete_audio_file(filename)
-        
-        if not success:
-            raise HTTPException(status_code=500, detail="Failed to delete file from S3")
-        
-        return {"message": f"Deleted {filename} from S3"}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"S3 delete error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
 @router.get("/health")
 async def health_check():
     """Health check endpoint"""

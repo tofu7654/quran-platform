@@ -1,45 +1,76 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 from fastapi.responses import JSONResponse
-import boto3
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = os.getenv("AWS_REGION")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
+from app.s3_client import s3_manager
+import logging
+from typing import Optional
+from datetime import datetime
+import uuid
 
 router = APIRouter()
-
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    region_name=AWS_REGION
-)
+logger = logging.getLogger(__name__)
 
 @router.post("/upload-audio")
-async def upload_audio_file(file: UploadFile = File(...)):
-    # Only allow .mp3 files
+async def upload_audio_file(
+    file: UploadFile = File(...),
+    user_id: Optional[str] = Query(None, description="Uploader's user ID (optional)")
+):
+    """
+    Uploads an audio file to S3 with a unique key.
+    If user_id is not provided, defaults to 'anonymous'.
+    """
     if not file.filename.endswith(".mp3"):
         raise HTTPException(status_code=400, detail="Only .mp3 files are allowed.")
+
+    if not user_id:
+        user_id = "anonymous"
+
     contents = await file.read()
-    s3_key = f"uploads/{file.filename}"
-    s3_client.put_object(
-        Bucket=BUCKET_NAME,
-        Key=s3_key,
-        Body=contents,
-        ContentType='audio/mpeg',
-    )
-    public_url = f"https://{BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{s3_key}"
+
+    try:
+        public_url = s3_manager.upload_file(
+            file_data=contents,
+            file_extension='mp3',
+            user_id=user_id
+        )
+
+        if not public_url:
+            raise Exception("S3Manager returned None")
+
+    except Exception as e:
+        logger.error(f"Failed to upload to S3: {e}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
+
     return JSONResponse({"url": public_url})
 
+
 @router.delete("/delete-audio")
-async def delete_audio_file(filename: str):
+async def delete_audio_file(
+    file_url: Optional[str] = Query(None, description="Full S3 public URL"),
+    s3_key: Optional[str] = Query(None, description="Alternatively, provide the S3 key directly")
+):
+    """
+    Deletes an audio file from S3.
+    Accepts either the full public URL or direct S3 key.
+    """
+    if not file_url and not s3_key:
+        raise HTTPException(status_code=400, detail="Provide either file_url or s3_key.")
+
+    if not s3_key:
+        # Extract key from the public URL
+        try:
+            split_part = f"{s3_manager.bucket_name}.s3.{s3_manager.s3_client.meta.region_name}.amazonaws.com/"
+            s3_key = file_url.split(split_part, 1)[1]
+        except (IndexError, AttributeError):
+            raise HTTPException(status_code=400, detail="Invalid file_url format.")
+
     try:
-        s3_client.delete_object(Bucket=BUCKET_NAME, Key=filename)
-        return {"message": f"Deleted {filename} from S3"}
+        s3_manager.initialize()
+        s3_manager.s3_client.delete_object(
+            Bucket=s3_manager.bucket_name,
+            Key=s3_key
+        )
     except Exception as e:
-        return {"error": str(e)} 
+        logger.error(f"Failed to delete from S3: {e}")
+        raise HTTPException(status_code=500, detail=f"Delete failed: {e}")
+
+    return {"message": f"Deleted {s3_key} from S3"}

@@ -48,7 +48,6 @@ class S3Manager:
                 Key=filename,
                 Body=file_data,
                 ContentType=f'audio/{file_extension}',
-                ACL='public-read'
             )
             
             # Generate public URL
@@ -78,7 +77,6 @@ class S3Manager:
                 Key=s3_key,
                 Body=file_data,
                 ContentType='audio/mpeg',
-                ACL='public-read'
             )
             
             # Build the public URL

@@ -1,4 +1,5 @@
 .env
+s3/venv
 echo "__pycache__/" >> .gitignore
 echo "*.pyc" >> .gitignore
 echo "*.mp3" >> .gitignore
