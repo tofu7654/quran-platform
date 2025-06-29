@@ -3,6 +3,7 @@ import FavoritesFeed from "./FavoritesFeed";
 
 function AudioFeed({ user, onSignOut }) {
     const [audioFiles, setAudioFiles] = useState([]);
+    const [likedIndexes, setLikedIndexes] = useState([]); // Track liked posts
     const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState({ name: "", location: "", file: null });
     const [dragActive, setDragActive] = useState(false);
@@ -60,11 +61,13 @@ function AudioFeed({ user, onSignOut }) {
     };
 
     const handleLike = (idx) => {
+        if (likedIndexes.includes(idx)) return; // Prevent multiple likes
         setAudioFiles((prev) =>
             prev.map((file, i) =>
                 i === idx ? { ...file, likes: file.likes + 1 } : file
             )
         );
+        setLikedIndexes((prev) => [...prev, idx]);
     };
 
     const handleFavorite = (idx) => {
